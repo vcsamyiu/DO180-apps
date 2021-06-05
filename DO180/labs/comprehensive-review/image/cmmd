@@ -1,0 +1,47 @@
+curl -v 10.88.0.3:8081/nexus/ 2>&1 | grep -E 'HTTP|<title>'
+
+[student@workstation image]$ sudo podman images
+REPOSITORY                            TAG      IMAGE ID       CREATED              SIZE
+localhost/nexus                       latest   5ac3b7a3bef3   About a minute ago   557 MB
+quay.io/vcsamyiu/nexus                latest   5ac3b7a3bef3   About a minute ago   557 MB
+registry.access.redhat.com/ubi7/ubi   7.7      0355cd652bd1   14 months ago        215 MB
+[student@workstation image]$ sudo podman push quay.io/vcsamyiu/nexus:latest
+Getting image source signatures
+Copying blob beb4a39bb3bd done
+Copying blob ac7577b8c383 skipped: already exists
+Copying blob 5601485f0109 skipped: already exists
+Copying config 5ac3b7a3be done
+Writing manifest to image destination
+Copying config 5ac3b7a3be done
+Writing manifest to image destination
+Writing manifest to image destination
+Storing signatures
+[student@workstation image]$ /home/student/DO180/labs/comprehensive-review/deploy/local/run-persistent.sh
+e36c2906a164a8fe150a5041be7a9afb236cba573e1962308bfb2a8d8091c345
+[student@workstation image]$ sudo podman ps
+CONTAINER ID  IMAGE                   COMMAND            CREATED         STATUS             PORTS  NAMES
+e36c2906a164  localhost/nexus:latest  sh nexus-start.sh  13 seconds ago  Up 13 seconds ago         loving_sanderson
+[student@workstation image]$ sudo podman inspect loving_sanderson | grep -i ipadd
+            "SecondaryIPAddresses": null,
+            "IPAddress": "10.88.0.3",
+[student@workstation image]$ gedit cmmd &
+[1] 6320
+[student@workstation image]$ curl -v 10.88.0.3:8081/nexus/ 2>&1 | grep -E 'HTTP|<title>'
+> GET /nexus/ HTTP/1.1
+< HTTP/1.1 200 OK
+  <title>Nexus Repository Manager</title>
+[student@workstation image]$ sudo podman rm loving_sanderson -f
+e36c2906a164a8fe150a5041be7a9afb236cba573e1962308bfb2a8d8091c345
+[student@workstation image]$ 
+[student@workstation image]$ cat /usr/local/etc/ocp4.config
+RHT_OCP4_MASTER_API=https://api.ap45.prod.nextcle.com:6443
+RHT_OCP4_WILDCARD_DOMAIN=apps.ap45.prod.nextcle.com
+RHT_OCP4_NEXUS_SERVER=nexus-common.apps.ap45.prod.nextcle.com
+RHT_OCP4_DEV_USER=vcsamyiu-au1-ibm-com
+RHT_OCP4_DEV_PASSWORD=a62f8905c67f41e0ae5a
+RHT_OCP4_GITHUB_USER=vcsamyiu
+RHT_OCP4_QUAY_USER=vcsamyiu
+[student@workstation image]$ echo ${RHT_OCP4_DEV_USER}
+vcsamyiu-au1-ibm-com
+[student@workstation image]$ 
+
